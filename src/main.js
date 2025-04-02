@@ -1,26 +1,35 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import ejs from 'ejs';
+import http from 'http';
+import socketIO from 'socket.io';
 
 import routes from './routes/routes.js';
 import logger from "./middlewares/logger.js";
 import errorHandler from "./middlewares/error.handler.js";
 
-const main = express();
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, { cors: { origin: '*' } });
 
-main.use(bodyParser.json());
-main.use(logger);
-main.engine('html', ejs.renderFile);
-main.set('view engine', 'html');
 
-main.use(routes);
-main.use(errorHandler);
+app.use(bodyParser.json());
+app.use(logger);
+app.engine('html', ejs.renderFile);
+app.set('view engine', 'html');
 
-main.use(function(_, response) {
+app.use(routes);
+app.use(errorHandler);
+
+app.use(function(_, response) {
   response.render('index');
 })
 
 const PORT = 9091;
 
-main.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`Server started on port ${PORT}`));
 
+io.on('connection', (socket) => {
+
+});
