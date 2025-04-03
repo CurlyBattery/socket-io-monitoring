@@ -3,6 +3,9 @@ import bodyParser from 'body-parser';
 import ejs from 'ejs';
 import http from 'http';
 import {Server} from 'socket.io';
+import Room from './room.js';
+
+const room = new Room();
 
 import routes from './routes/routes.js';
 import logger from "./middlewares/logger.js";
@@ -26,19 +29,20 @@ app.use(function(_, response) {
 
 const PORT = 9091;
 
-
-
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
+  const roomID= await room.joinRoom();
+  socket.join(roomID);
   console.log('Пользователь подключился')
 
   // Обработка сообщения от клиента
-  socket.on('message', (msg) => {
-    console.log('Получено сообщение:', msg);
+  socket.on('send-message', (message) => {
+    console.log('Получено сообщение:', message);
     // Отправляем сообщение обратно клиенту (эхо)
-    socket.emit('message', msg.toString() + ' от сервера');
+    io.to(roomID).emit('receive-message', message);
   });
 
   socket.on('disconnect', () => {
+    room.leaveRoom(roomID);
     console.log('Пользователь отключился')
   })
 })

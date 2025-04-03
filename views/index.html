@@ -10,18 +10,88 @@
 </head>
 <body>
 
+<h1>Routes</h1>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Count visits</th>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td id="post-field"></td>
+    </tr>
+    <tr>
+        <td>GET ALL</td>
+        <td id="get-all-field">0</td>
+    </tr>
+    <tr>
+        <td>GET ONE</td>
+        <td id="get-one-field">0</td>
+    </tr>
+    <tr>
+        <td>PATCH</td>
+        <td id="patch-field">0</td>
+    </tr>
+    <tr>
+        <td>DELETE</td>
+        <td id="delete-field" >0</td>
+    </tr>
+</table>
+
+
 <script>
+  let postCount = 0;
+  let getAllCount = 0;
+  let getOneCount = 0;
+  let patchCount = 0;
+  let deleteCount = 0;
+  const postField = document.getElementById('post-field');
+  const getAllField = document.getElementById('get-all-field');
+  const getOneField = document.getElementById('get-one-field');
+  const patchField = document.getElementById('patch-field');
+  const deleteField = document.getElementById('delete-field');
+  postField.innerHTML = postCount.toString();
+  getAllField.innerHTML = getAllCount.toString();
+  getOneField.innerHTML = getOneCount.toString();
+  patchField.innerHTML = patchCount.toString();
+  deleteField.innerHTML = deleteCount.toString();
+
   const socket = io.connect('http://localhost:9090');
 
   socket.on('connect', () => {
-    console.log('Подключено к серверу');
 
-    socket.emit('message', 'Привет сервер');
+    console.log('Сервис html подключился к web socket');
   });
 
-  socket.on('message', (msg) => {
-    console.log('Сообщение от сервера: ', msg);
-  })
+  socket.on('receive-message', (message) => displayMessage(message))
+
+  // Функция для отображения сообщения в чате
+  function displayMessage(message) {
+    const parseData = JSON.parse(message);
+    switch (parseData.method) {
+      case 'POST':
+        postCount++;
+        postField.innerHTML = postCount.toString();
+        break;
+      case 'GET_ALL':
+        getAllCount++;
+        getAllField.innerHTML = getAllCount.toString();
+        break;
+      case 'GET_ONE':
+        getOneCount++;
+        getOneField.innerHTML = getOneCount.toString();
+        break;
+      case 'PATCH':
+        patchCount++;
+        patchField.innerHTML = patchCount.toString();
+        break;
+      case 'DELETE':
+        deleteCount++;
+        deleteField.innerHTML = deleteCount.toString();
+        break;
+    }
+  }
 </script>
 
 </body>
