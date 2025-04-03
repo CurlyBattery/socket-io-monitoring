@@ -5,37 +5,24 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Monitoring Socket IO</title>
+    <title>Document</title>
+    <script src="http://localhost:9090/socket.io/socket.io.js"></script>
 </head>
 <body>
-<h1>Routes with socket.io</h1>
 
-<table>
-    <tr>
-        <th>Method</th>
-        <th>Count visits</th>
-    </tr>
-    <tr>
-        <td>POST</td>
-        <td id="post-field"></td>
-    </tr>
-    <tr>
-        <td>GET ALL</td>
-        <td id="get-all-field">0</td>
-    </tr>
-    <tr>
-        <td>GET ONE</td>
-        <td id="get-one-field">0</td>
-    </tr>
-    <tr>
-        <td>PATCH</td>
-        <td id="patch-field">0</td>
-    </tr>
-    <tr>
-        <td>DELETE</td>
-        <td id="delete-field" >0</td>
-    </tr>
-</table>
+<script>
+  const socket = io.connect('http://localhost:9090');
+
+  socket.on('connect', () => {
+    console.log('Подключено к серверу');
+
+    socket.emit('message', 'Привет сервер');
+  });
+
+  socket.on('message', (msg) => {
+    console.log('Сообщение от сервера: ', msg);
+  })
+</script>
 
 </body>
 </html>
